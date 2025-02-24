@@ -1,6 +1,5 @@
-import json
 import time
-import traceback
+import logging
 import streamlit as st
 
 from copy import deepcopy
@@ -158,20 +157,23 @@ if st.session_state.IS_CONNECTED_DB:
         if st.button("Generate ..."):
             try:
                 start = time.time()
-                print("Starting...")
-                print(st.session_state.OPENAI_API_KEY)
-                output, tokens = openai_response(user_content, system_content)
-                print("Generate Product Recommendation model is success !!!\n")
+                logging.info("Starting...")
+                output, tokens = openai_response(
+                    user_content=user_content,
+                    system_content=system_content,
+                    api_key=st.session_state.OPENAI_API_KEY,
+                )
+                logging.info("Generate Product Recommendation model is success !!!\n")
+                logging.debug(f"Prompt (Input) tokens: {tokens.prompt_tokens}")
+                logging.debug(f"Completion (Output) tokens: {tokens.completion_tokens}")
                 st.write(output)
                 time_execute = time.time() - start
-                _, response_write = st.columns([5, 1])
+                _, response_write = st.columns([6, 2])
                 with response_write:
-                    markdown_response = (
-                        f"Execute {tokens} tokens in {round(time_execute, 2)}s."
-                    )
+                    markdown_response = f"Execute total {tokens.total_tokens} tokens in {round(time_execute, 2)}s."
+                    st.write(markdown_response)
             except ValueError as summary_error:
                 st.error(summary_error)
-                # st.error(f"Detail Error: {traceback.format_exc()}")
 
     # MODEL CONFIGURATION AND DATABASE CONFIGURATION LAYOUT SECTION
     with layout_right:
