@@ -26,13 +26,13 @@ def openai_response(
                 # User request
                 {"role": "user", "content": user_content},
             ],
-            n=n,
+            n=int(n),
             stop=stop,
-            top_p=top_p,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            presence_penalty=presence_penalty,
-            frequency_penalty=frequency_penalty,
+            top_p=float(top_p),
+            max_tokens=int(max_tokens),
+            temperature=float(temperature),
+            presence_penalty=float(presence_penalty),
+            frequency_penalty=float(frequency_penalty),
         )
         output = response.choices[0].message.content
         tokens = response.usage

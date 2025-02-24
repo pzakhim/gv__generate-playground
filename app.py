@@ -126,7 +126,7 @@ if st.session_state.IS_CONNECTED_DB:
             user_request = st.text_area(
                 "User request to OpenAI", user_query["user_request"], height=750
             )
-            #
+
             update_field, response_field = st.columns([2, 4])
             with update_field:
                 if st.session_state.IS_CONNECTED_DB:
@@ -159,9 +159,18 @@ if st.session_state.IS_CONNECTED_DB:
                 start = time.time()
                 logging.info("Starting...")
                 output, tokens = openai_response(
-                    user_content=user_content,
+                    user_content=user_request,
                     system_content=system_content,
                     api_key=st.session_state.OPENAI_API_KEY,
+                    model_name=st.session_state.MODEL_CONFIG["model_name"],
+                    max_tokens=st.session_state.MODEL_CONFIG["max_tokens"],
+                    n=st.session_state.MODEL_CONFIG["n"],
+                    top_p=st.session_state.MODEL_CONFIG["top_p"],
+                    temperature=st.session_state.MODEL_CONFIG["temperature"],
+                    frequency_penalty=st.session_state.MODEL_CONFIG[
+                        "frequency_penalty"
+                    ],
+                    presence_penalty=st.session_state.MODEL_CONFIG["presence_penalty"],
                 )
                 logging.info("Generate Product Recommendation model is success !!!\n")
                 logging.debug(f"Prompt (Input) tokens: {tokens.prompt_tokens}")
@@ -197,8 +206,7 @@ if st.session_state.IS_CONNECTED_DB:
                     display_key = [
                         " ".join(word.capitalize() for word in key.split("_"))
                     ]
-                    st.text_input(display_key[0], value)
-                    new_model_parameters[key] = value
+                    new_model_parameters[key] = st.text_input(display_key[0], value)
 
             # Save model parameters
             save_cols, params_update_response = st.columns([2, 5])
@@ -207,6 +215,7 @@ if st.session_state.IS_CONNECTED_DB:
                 if save_parameter:
                     # update_model_config(collection, model_name, new_max_tokens)
                     st.session_state.MODEL_CONFIG = deepcopy(new_model_parameters)
+                    logging.debug(st.session_state.MODEL_CONFIG)
                     with params_update_response:
                         st.success(
                             "Save model successful !!!",
